@@ -8,7 +8,8 @@ try:
 except ImportError:
     gevent = None
 
-DEFAULT_HEADERS = {'Content-Type': 'application/json'}
+HOMEPAGE = 'https://github.com/lepture/tower-slack'
+
 TOWER_ICON = (
     'https://tower.im/assets/mobile/icon/'
     'icon@512-84fa5f6ced2a1bd53a409013f739b7ba.png'
@@ -67,7 +68,7 @@ class TowerSlack(object):
 
         kwargs = dict(
             data=json.dumps(payload),
-            headers=DEFAULT_HEADERS,
+            headers={'Content-Type': 'application/json'},
             timeout=self.timeout,
         )
 
@@ -120,32 +121,42 @@ class TowerSlack(object):
         attachment['text'] = text
         return {'attachments': [attachment]}
 
-    def application(self, environ, start_response):
+    @staticmethod
+    def response(start_response, code='200 OK', body='ok', headers=None):
+        if headers is None:
+            headers = []
+        headers.extend([
+            ('Content-Type', 'text/plain'),
+            ('Content-Length', str(len(body))),
+        ])
+        start_response(code, headers)
+        return [body]
+
+    @classmethod
+    def redirect_homepage(cls, start_response):
+        body = 'Redirect to %s' % HOMEPAGE
+        headers = [('Location', HOMEPAGE)]
+        code = '301 Moved Permanently'
+        return cls.response(start_response, code, body, headers)
+
+    def __call__(self, environ, start_response):
         req = BaseRequest(environ)
 
-        def make_response(code='200 OK', body='ok'):
-            headers = [
-                ('Content-Type', 'text/plain'),
-                ('Content-Length', str(len(body))),
-            ]
-            start_response(code, headers)
-            return [body]
-
         if req.method != 'POST':
-            return make_response()
+            return self.redirect_homepage(start_response)
 
         event = req.headers.get('X-Tower-Event')
         if not event:
-            return make_response('404 Not Found', '404')
+            return self.response('400 Bad Request', '400')
 
         signature = req.headers.get('X-Tower-Signature')
         if signature and signature[0] not in ('@', '#'):
-            return make_response('404 Not Found', '404')
+            return self.response('400 Bad Request', '400')
 
         payload = self.create_payload(json.load(req.stream), event)
         url = 'https://hooks.slack.com/services/%s' % (req.path.lstrip('/'))
         self.send_payload(payload, url, signature)
-        return make_response()
+        return self.redirect_homepage(start_response)
 
 
 if __name__ == '__main__':
@@ -154,6 +165,6 @@ if __name__ == '__main__':
     except ImportError:
         from wsgiref.simple_server import make_server
 
-    tower = TowerSlack()
-    server = make_server('', 8000, tower.application)
+    application = TowerSlack()
+    server = make_server('', 8000, application)
     server.serve_forever()
