@@ -52,10 +52,10 @@ ACTION_COLORS = {
 
 
 class TowerSlack(object):
-    def __init__(self, slack_url, tower_secret=None, name='Tower',
+    def __init__(self, url, signature=None, name='Tower',
                  icon=TOWER_ICON, channel=None):
-        self.slack_url = slack_url
-        self.tower_secret = tower_secret
+        self.url = url
+        self.signature = signature
         self.name = name
         self.icon = icon
         self.channel = channel
@@ -69,7 +69,7 @@ class TowerSlack(object):
             payload['channel'] = self.channel
 
         requests.post(
-            self.slack_url,
+            self.url,
             data=json.dumps(payload),
             headers=DEFAULT_HEADERS,
             timeout=2,
@@ -120,9 +120,9 @@ class TowerSlack(object):
         return {'attachments': [attachment]}
 
     def parse_request(self, headers, body):
-        if self.tower_secret:
-            secret = headers.get('X-Tower-Signature')
-            if self.tower_secret != secret:
+        if self.signature:
+            signature = headers.get('X-Tower-Signature')
+            if self.signature != signature:
                 return None
 
         event = headers.get('X-Tower-Event')
