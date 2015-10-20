@@ -46,9 +46,11 @@ MESSAGES = {
     'attachments': u'文件',
 }
 
-ACTION_COLORS = {
-    'updated': 'good',
+COLORS = {
+    'created': '#439FE0',
+    'updated': 'warning',
     'completed': 'good',
+    'deleted': 'danger',
 }
 
 
@@ -83,7 +85,7 @@ class TowerSlack(object):
         data = body['data']
 
         attachment = {}
-        color = ACTION_COLORS.get(action)
+        color = COLORS.get(action)
         if color:
             attachment['color'] = color
 
