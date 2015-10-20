@@ -159,14 +159,3 @@ class TowerSlack(object):
         url = 'https://hooks.slack.com/services/%s' % (req.path.lstrip('/'))
         self.send_payload(payload, url, signature)
         return self.redirect_homepage(start_response)
-
-
-if __name__ == '__main__':
-    try:
-        from gevent.pywsgi import WSGIServer as make_server
-    except ImportError:
-        from wsgiref.simple_server import make_server
-
-    application = TowerSlack()
-    server = make_server('', 8000, application)
-    server.serve_forever()
