@@ -1,2 +1,2 @@
-requests==2.8.1
-Werkzeug==0.10.4
+requests
+Werkzeug
