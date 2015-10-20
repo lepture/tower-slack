@@ -52,28 +52,29 @@ ACTION_COLORS = {
 
 
 class TowerSlack(object):
-    def __init__(self, url, signature=None, name='Tower',
-                 icon=TOWER_ICON, channel=None):
-        self.url = url
-        self.signature = signature
+    def __init__(self, name='Tower', icon=TOWER_ICON, timeout=2):
         self.name = name
         self.icon = icon
-        self.channel = channel
+        self.timeout = timeout
 
-    def send_payload(self, payload):
+    def send_payload(self, payload, url, channel=None):
         if self.name:
             payload['username'] = self.name
         if self.icon:
             payload['icon_url'] = self.icon
-        if self.channel:
-            payload['channel'] = self.channel
+        if channel:
+            payload['channel'] = channel
 
-        requests.post(
-            self.url,
+        kwargs = dict(
             data=json.dumps(payload),
             headers=DEFAULT_HEADERS,
-            timeout=2,
+            timeout=self.timeout,
         )
+
+        if gevent:
+            gevent.spawn(requests.post, url, **kwargs)
+        else:
+            requests.post(url, **kwargs)
 
     @staticmethod
     def create_payload(body, event):
@@ -119,30 +120,40 @@ class TowerSlack(object):
         attachment['text'] = text
         return {'attachments': [attachment]}
 
-    def parse_request(self, headers, body):
-        if self.signature:
-            signature = headers.get('X-Tower-Signature')
-            if self.signature != signature:
-                return None
-
-        event = headers.get('X-Tower-Event')
-        return self.create_payload(body, event)
-
     def application(self, environ, start_response):
         req = BaseRequest(environ)
 
-        if req.method == 'POST':
-            data = json.load(req.stream)
-            payload = self.parse_request(req.headers, data)
-            if gevent:
-                gevent.spawn(self.send_payload, payload)
-            else:
-                self.send_payload(payload)
+        def make_response(code='200 OK', body='ok'):
+            headers = [
+                ('Content-Type', 'text/plain'),
+                ('Content-Length', str(len(body))),
+            ]
+            start_response(code, headers)
+            return [body]
 
-        body = 'ok'
-        headers = [
-            ('Content-Type', 'text/plain'),
-            ('Content-Length', str(len(body))),
-        ]
-        start_response('200 OK', headers)
-        return [body]
+        if req.method != 'POST':
+            return make_response()
+
+        event = req.headers.get('X-Tower-Event')
+        if not event:
+            return make_response('404 Not Found', '404')
+
+        signature = req.headers.get('X-Tower-Signature')
+        if signature and signature[0] not in ('@', '#'):
+            return make_response('404 Not Found', '404')
+
+        payload = self.create_payload(json.load(req.stream), event)
+        url = 'https://hooks.slack.com/services/%s' % (req.path.lstrip('/'))
+        self.send_payload(payload, url, signature)
+        return make_response()
+
+
+if __name__ == '__main__':
+    try:
+        from gevent.pywsgi import WSGIServer as make_server
+    except ImportError:
+        from wsgiref.simple_server import make_server
+
+    tower = TowerSlack()
+    server = make_server('', 8000, tower.application)
+    server.serve_forever()
