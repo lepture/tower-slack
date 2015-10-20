@@ -1,2 +1,3 @@
 requests
 Werkzeug
+leancloud-sdk

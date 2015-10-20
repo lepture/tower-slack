@@ -1,8 +1,15 @@
 # coding: utf-8
 
 from towerslack import TowerSlack
+try:
+    from leancloud import Engine
+except ImportError:
+    Engine = None
 
 application = TowerSlack()
+
+if Engine:
+    application = Engine(application)
 
 
 if __name__ == '__main__':
