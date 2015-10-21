@@ -114,7 +114,7 @@ class TowerSlack(object):
         if action in ['assigned', 'unassigned']:
             assignee = subject.get('assignee')
             if assignee:
-                text = u'%s 给 **%s**' % (text, assignee['nickname'])
+                text = u'%s 给 *%s*' % (text, assignee['nickname'])
 
         comment = data.get('comment')
         if comment:
