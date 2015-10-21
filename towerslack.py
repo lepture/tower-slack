@@ -105,26 +105,23 @@ class TowerSlack(object):
             author_link = 'https://tower.im/members/%s/' % (author['guid'])
             attachment['author_link'] = author_link
 
-        action_text = u'%s%s' % (
+        text = u'%s <%s|#%s> 的%s <%s|%s>' % (
             MESSAGES.get(action, action),
-            MESSAGES.get(event, event),
-        )
-
-        text = u'<%s|#%s>: %s <%s|%s>' % (
             project_url, project['name'],
-            action_text,
+            MESSAGES.get(event, event),
             subject_url, subject['title'],
         )
         if action in ['assigned', 'unassigned']:
             assignee = subject.get('assignee')
             if assignee:
-                text = u'%s 给 %s' % (text, assignee['nickname'])
+                text = u'%s 给 **%s**' % (text, assignee['nickname'])
 
-        content = subject.get('content')
-        if content:
-            text = u'%s \n> %s' % (text, content)
+        comment = data.get('comment')
+        if comment:
+            text = u'%s\n> %s' % (text, comment['content'])
 
         attachment['text'] = text
+        attachment['mrkdwn_in'] = ['text']
         return {'attachments': [attachment]}
 
     def __call__(self, environ, start_response):
