@@ -123,39 +123,46 @@ class TowerSlack(object):
         attachment['text'] = text
         return {'attachments': [attachment]}
 
-    @staticmethod
-    def response(start_response, code='200 OK', body='ok', headers=None):
-        if headers is None:
-            headers = []
-        headers.extend([
-            ('Content-Type', 'text/plain'),
-            ('Content-Length', str(len(body))),
-        ])
-        start_response(code, headers)
-        return [body]
-
-    @classmethod
-    def redirect_homepage(cls, start_response):
-        body = 'Redirect to %s' % HOMEPAGE
-        headers = [('Location', HOMEPAGE)]
-        code = '301 Moved Permanently'
-        return cls.response(start_response, code, body, headers)
-
     def __call__(self, environ, start_response):
         req = BaseRequest(environ)
 
+        if req.path == '/ip':
+            return response(start_response, body=str(req.remote_addr))
+
         if req.method != 'POST':
-            return self.redirect_homepage(start_response)
+            return redirect_homepage(start_response)
 
         event = req.headers.get('X-Tower-Event')
         if not event:
-            return self.response('400 Bad Request', '400')
+            return bad_request(start_response)
 
         signature = req.headers.get('X-Tower-Signature')
         if signature and signature[0] not in ('@', '#'):
-            return self.response('400 Bad Request', '400')
+            signature = None
 
         payload = self.create_payload(json.load(req.stream), event)
         url = 'https://hooks.slack.com/services/%s' % (req.path.lstrip('/'))
         self.send_payload(payload, url, signature)
-        return self.redirect_homepage(start_response)
+        return response(start_response)
+
+
+def response(start_response, code='200 OK', body='ok', headers=None):
+    if headers is None:
+        headers = []
+    headers.extend([
+        ('Content-Type', 'text/plain'),
+        ('Content-Length', str(len(body))),
+    ])
+    start_response(code, headers)
+    return [body]
+
+
+def redirect_homepage(start_response):
+    body = 'Redirect to %s' % HOMEPAGE
+    headers = [('Location', HOMEPAGE)]
+    code = '301 Moved Permanently'
+    return response(start_response, code, body, headers)
+
+
+def bad_request(start_response):
+    response(start_response, code='400 Bad Request', body='400')
