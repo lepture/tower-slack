@@ -9,8 +9,6 @@ except ImportError:
 application = TowerSlack()
 
 if Engine:
-    from werkzeug.contrib.fixers import ProxyFix
-    application = ProxyFix(application)
     application = Engine(application)
 
 
