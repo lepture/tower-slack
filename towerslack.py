@@ -39,7 +39,7 @@ MESSAGES = {
     'assigned': u'指派',
     'unassigned': u'取消指派',
 
-    'docs': u'文档',
+    'documents': u'文档',
     'topics': u'讨论',
     'todos': u'任务',
     'todolists': u'任务清单',
@@ -149,8 +149,9 @@ class TowerSlack(object):
 
 def get_subject_url(project_url, event, guid):
     if event == 'topics':
-        # fix url for topics
         event = 'messages'
+    elif event == 'documents':
+        event = 'docs'
     return '%s%s/%s/' % (project_url, event, guid)
 
 
