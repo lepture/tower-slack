@@ -1,14 +1,15 @@
 # coding: utf-8
 
+import sys
 import json
-import logging
 import requests
 from werkzeug.wrappers import BaseRequest
+
 try:
     import gevent
 except ImportError:
     gevent = None
-    logging.info('gevent is not available')
+    print('gevent is not available')
 
 HOMEPAGE = 'https://github.com/lepture/tower-slack'
 
@@ -183,4 +184,4 @@ def http_post(url, **kwargs):
     try:
         requests.post(url, **kwargs)
     except Exception as e:
-        logging.exception(e)
+        sys.stderr.write(str(e))
