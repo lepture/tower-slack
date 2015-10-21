@@ -179,7 +179,4 @@ def bad_request(start_response):
 
 
 def http_post(url, **kwargs):
-    try:
-        requests.post(url, **kwargs)
-    except Exception as e:
-        sys.stderr.write(str(e))
+    requests.post(url, **kwargs)
