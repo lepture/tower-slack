@@ -1,12 +1,14 @@
 # coding: utf-8
 
 import json
+import logging
 import requests
 from werkzeug.wrappers import BaseRequest
 try:
     import gevent
 except ImportError:
     gevent = None
+    logging.info('gevent is not available')
 
 HOMEPAGE = 'https://github.com/lepture/tower-slack'
 
@@ -75,9 +77,9 @@ class TowerSlack(object):
         )
 
         if gevent:
-            gevent.spawn(requests.post, url, **kwargs)
+            gevent.spawn(http_post, url, **kwargs)
         else:
-            requests.post(url, **kwargs)
+            http_post(url, **kwargs)
 
     @staticmethod
     def create_payload(body, event):
@@ -175,3 +177,10 @@ def redirect_homepage(start_response):
 
 def bad_request(start_response):
     return response(start_response, code='400 Bad Request', body='400')
+
+
+def http_post(url, **kwargs):
+    try:
+        requests.post(url, **kwargs)
+    except Exception as e:
+        logging.exception(e)

@@ -6,7 +6,7 @@ try:
 except ImportError:
     Engine = None
 
-application = TowerSlack()
+application = TowerSlack(timeout=5)
 
 if Engine:
     application = Engine(application)
