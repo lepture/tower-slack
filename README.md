@@ -2,7 +2,7 @@
 
 将 Tower.im 的消息发送到 Slack 上。
 
-<https://tower-slack.avosapps.com>
+<https://tower-slack.avosapps.com> / <https://tower-slack.avosapps.us>
 
 ![Slack 消息示例](https://cloud.githubusercontent.com/assets/290496/10628183/a9b02d5c-77f4-11e5-9894-faf7b2ede82e.png)
 
