@@ -97,7 +97,7 @@ class TowerSlack(object):
             subject = data.pop(keys[0])
         else:
             subject = data.pop(event[:-1])
-        subject_url = '%s%s/%s/' % (project_url, event, subject['guid'])
+        subject_url = get_subject_url(project_url, event, subject['guid'])
 
         author = subject.get('handler')
         if author:
@@ -110,7 +110,7 @@ class TowerSlack(object):
             MESSAGES.get(event, event),
         )
 
-        text = u'[<%s|%s>]: %s <%s|%s>' % (
+        text = u'<%s|#%s>: %s <%s|%s>' % (
             project_url, project['name'],
             action_text,
             subject_url, subject['title'],
@@ -146,6 +146,13 @@ class TowerSlack(object):
         return response(start_response)
 
 
+def get_subject_url(project_url, event, guid):
+    if event == 'topics':
+        # fix url for topics
+        event = 'messages'
+    return '%s%s/%s/' % (project_url, event, guid)
+
+
 def response(start_response, code='200 OK', body='ok', headers=None):
     if headers is None:
         headers = []
@@ -165,4 +172,4 @@ def redirect_homepage(start_response):
 
 
 def bad_request(start_response):
-    response(start_response, code='400 Bad Request', body='400')
+    return response(start_response, code='400 Bad Request', body='400')
