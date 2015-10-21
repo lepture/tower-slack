@@ -120,7 +120,9 @@ class TowerSlack(object):
 
         comment = data.get('comment')
         if comment:
-            text = u'%s\n> %s' % (text, comment['content'])
+            content = comment['content']
+            content = content.strip().replace('\n', '\n> ')
+            text = u'%s\n> %s' % (text, content)
 
         attachment['text'] = text
         attachment['mrkdwn_in'] = ['text']
