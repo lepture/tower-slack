@@ -9,7 +9,6 @@ try:
     import gevent
 except ImportError:
     gevent = None
-    print('gevent is not available')
 
 HOMEPAGE = 'https://github.com/lepture/tower-slack'
 
@@ -129,9 +128,6 @@ class TowerSlack(object):
 
     def __call__(self, environ, start_response):
         req = BaseRequest(environ)
-
-        if req.path == '/ip':
-            return response(start_response, body=str(req.remote_addr))
 
         if req.method != 'POST':
             return redirect_homepage(start_response)
