@@ -120,6 +120,10 @@ class TowerSlack(object):
             if assignee:
                 text = u'%s 给 %s' % (text, assignee['nickname'])
 
+        content = subject.get('content')
+        if content:
+            text = u'%s \n> %s' % (text, content)
+
         attachment['text'] = text
         return {'attachments': [attachment]}
 
