@@ -120,7 +120,10 @@ class TowerSlack(object):
         comment = data.get('comment')
         if comment:
             content = comment['content']
-            content = content.strip().replace('\n', '\n> ')
+            lines = content.strip().splitlines()
+            content = lines[0]
+            if len(lines) > 1:
+                content += u' ...'
             text = u'%s\n> %s' % (text, content)
 
         attachment['text'] = text
