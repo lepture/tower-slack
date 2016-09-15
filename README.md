@@ -21,7 +21,7 @@ https://hooks.slack.com/services/T0DRRRYS1/C9XZ5VL2/bqiCkTrLYMpJcDaKG9HaS4yu
 将获取到的链接替换成 tower-slack 的链接：
 
 ```
-https://tower-slack.avosapps.us/T0DRRRYS1/C9XZ5VL2/bqiCkTrLYMpJcDaKG9HaS4yu
+https://tower-slack.leanapp.cn/T0DRRRYS1/C9XZ5VL2/bqiCkTrLYMpJcDaKG9HaS4yu
 ```
 
 在 Tower.im 上添加 webhook，填入 tower-slack 的链接
