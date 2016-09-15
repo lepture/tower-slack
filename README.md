@@ -2,7 +2,7 @@
 
 将 Tower.im 的消息发送到 Slack 上。
 
-美国：<https://tower-slack.avosapps.us> / 中国：<https://tower-slack.avosapps.com>
+<https://tower-slack.leanapp.cn>
 
 > 网络延迟主要取决于 Tower.im -> tower-slack -> Slack 的时间和。
 > 目前测试的结果，使用 Leancloud 美国节点稍微好一点。
@@ -32,4 +32,4 @@ Tower.im webhook 上的 Secret 可不填。如需改变 channel，可将 channel
 
 ## 部署到 Leancloud
 
-你可以使用我部署好的 <https://tower-slack.avosapps.us/> 也可以自己部署到 Leancloud。直接 clone 这个仓库就可以部署到 Leancloud 了，具体操作请参考 Leancloud 文档。
+你可以使用我部署好的 <https://tower-slack.leanapp.cn> 也可以自己部署到 Leancloud。直接 clone 这个仓库就可以部署到 Leancloud 了，具体操作请参考 Leancloud 文档。
