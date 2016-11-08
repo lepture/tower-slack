@@ -2,7 +2,8 @@
 
 将 Tower.im 的消息发送到 Slack 上。
 
-<https://tower-slack.leanapp.cn>
+1. China: <https://tower-slack.leanapp.cn>
+2. America: <https://tower-slack.avosapps.us>
 
 > 网络延迟主要取决于 Tower.im -> tower-slack -> Slack 的时间和。
 > 目前测试的结果，使用 Leancloud 美国节点稍微好一点。
